@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Compass, UserRound, ShieldCheck, LogOut } from "lucide-react";
+import { Compass, UserRound, Star, ShieldCheck, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const links = [
   { href: "/diretorio", label: "Diretório", icon: Compass },
   { href: "/meu-perfil", label: "Meu perfil", icon: UserRound },
+  { href: "/favoritos", label: "Favoritos", icon: Star },
 ];
 
 export function AppNav({ isAdmin }: { isAdmin: boolean }) {

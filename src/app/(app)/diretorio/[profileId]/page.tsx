@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { RatingForm } from "@/components/profile/rating-form";
+import { FavoriteButton } from "@/components/profile/favorite-button";
 import { cn } from "@/lib/utils";
 
 function formatDate(date: Date) {
@@ -54,21 +55,26 @@ export default async function ProviderProfilePage(props: {
   const user = await requireUser();
   const { profileId } = await props.params;
 
-  const profile = await prisma.providerProfile.findUnique({
-    where: { id: profileId },
-    include: {
-      user: { select: { id: true, name: true } },
-      categories: { include: { category: true } },
-      photos: { orderBy: { position: "asc" } },
-      ratings: {
-        include: {
-          rater: { select: { name: true } },
-          category: { select: { id: true, name: true } },
+  const [profile, myFavorite] = await Promise.all([
+    prisma.providerProfile.findUnique({
+      where: { id: profileId },
+      include: {
+        user: { select: { id: true, name: true } },
+        categories: { include: { category: true } },
+        photos: { orderBy: { position: "asc" } },
+        ratings: {
+          include: {
+            rater: { select: { name: true } },
+            category: { select: { id: true, name: true } },
+          },
+          orderBy: { createdAt: "desc" },
         },
-        orderBy: { createdAt: "desc" },
       },
-    },
-  });
+    }),
+    prisma.favorite.findUnique({
+      where: { userId_providerProfileId: { userId: user.id, providerProfileId: profileId } },
+    }),
+  ]);
 
   const isOwner = profile?.user.id === user.id;
   const canView =
@@ -137,6 +143,15 @@ export default async function ProviderProfilePage(props: {
             </Badge>
           ))}
         </div>
+        {!isOwner && (
+          <div className="mt-3">
+            <FavoriteButton
+              profileId={profile.id}
+              initialFavorited={Boolean(myFavorite)}
+              initialNote={myFavorite?.note ?? ""}
+            />
+          </div>
+        )}
       </div>
 
       {profile.photos.length > 0 && (

@@ -48,6 +48,7 @@ model User {
   ratingsGiven        Rating[]         @relation("RatingsGiven")
   inviteCodesMade     InviteCode[]     @relation("InviteCodeCreator")
   categorySuggestions Category[]       @relation("CategorySuggestions")
+  favorites           Favorite[]
 
   @@index([invitedById])
 }
@@ -109,8 +110,22 @@ model ProviderProfile {
   categories ProfileCategory[]
   photos     ProfilePhoto[]
   ratings    Rating[]
+  favoritedBy Favorite[]
 
   @@index([isPublished])
+}
+
+model Favorite {
+  id                String          @id @default(cuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  providerProfileId String
+  providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  note              String?         @db.Text
+  createdAt         DateTime        @default(now())
+
+  @@unique([userId, providerProfileId])
+  @@index([providerProfileId])
 }
 
 model ProfileCategory {
