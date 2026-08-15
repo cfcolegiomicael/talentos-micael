@@ -1,4 +1,9 @@
-import { createCategoryAction, deleteCategoryAction } from "@/actions/admin-actions";
+import {
+  approveCategoryAction,
+  createCategoryAction,
+  deleteCategoryAction,
+  rejectCategoryAction,
+} from "@/actions/admin-actions";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,12 +15,54 @@ export const metadata = { title: "Categorias — Admin" };
 
 export default async function CategoriasAdminPage() {
   const categories = await prisma.category.findMany({
+    where: { status: "APPROVED" },
     orderBy: { name: "asc" },
     include: { _count: { select: { profiles: true } } },
   });
 
+  const pendingCategories = await prisma.category.findMany({
+    where: { status: "PENDING" },
+    orderBy: { createdAt: "asc" },
+    include: { suggestedBy: { select: { name: true } } },
+  });
+
   return (
     <div className="flex flex-col gap-6">
+      {pendingCategories.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Sugestões pendentes</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-3">
+            {pendingCategories.map((category) => (
+              <div
+                key={category.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-md border p-3"
+              >
+                <div>
+                  <p className="text-sm font-medium">{category.name}</p>
+                  <p className="text-muted-foreground text-xs">
+                    Sugerida por {category.suggestedBy?.name ?? "membro removido"}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <form action={approveCategoryAction.bind(null, category.id)}>
+                    <Button type="submit" size="sm">
+                      Aprovar
+                    </Button>
+                  </form>
+                  <form action={rejectCategoryAction.bind(null, category.id)}>
+                    <Button type="submit" variant="outline" size="sm">
+                      Rejeitar
+                    </Button>
+                  </form>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Nova categoria</CardTitle>

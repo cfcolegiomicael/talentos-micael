@@ -44,9 +44,10 @@ model User {
   invitedById   String?
   invitedByCode InviteCode? @relation("InviteCodeUsedBy", fields: [invitedById], references: [id])
 
-  providerProfile ProviderProfile?
-  ratingsGiven    Rating[]         @relation("RatingsGiven")
-  inviteCodesMade InviteCode[]     @relation("InviteCodeCreator")
+  providerProfile     ProviderProfile?
+  ratingsGiven        Rating[]         @relation("RatingsGiven")
+  inviteCodesMade     InviteCode[]     @relation("InviteCodeCreator")
+  categorySuggestions Category[]       @relation("CategorySuggestions")
 
   @@index([invitedById])
 }
@@ -68,14 +69,24 @@ model InviteCode {
   @@index([createdById])
 }
 
+enum CategoryStatus {
+  PENDING
+  APPROVED
+}
+
 model Category {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  slug      String   @unique
-  createdAt DateTime @default(now())
+  id            String         @id @default(cuid())
+  name          String         @unique
+  slug          String         @unique
+  status        CategoryStatus @default(APPROVED)
+  suggestedById String?
+  suggestedBy   User?          @relation("CategorySuggestions", fields: [suggestedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime       @default(now())
 
   profiles ProfileCategory[]
   ratings  Rating[]
+
+  @@index([status])
 }
 
 model ProviderProfile {

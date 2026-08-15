@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CategorySuggestForm } from "@/components/profile/category-suggest-form";
 
 type Category = { id: string; name: string };
 
@@ -146,6 +147,7 @@ export function ProfileForm({
           {errors.categoryIds && (
             <p className="text-sm text-destructive mt-2">{errors.categoryIds.message}</p>
           )}
+          <CategorySuggestForm />
         </CardContent>
       </Card>
 

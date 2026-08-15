@@ -22,7 +22,7 @@ export default async function DiretorioPage(props: {
   const { q, categoria } = await props.searchParams;
 
   const [categories, profiles] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { status: "APPROVED" }, orderBy: { name: "asc" } }),
     prisma.providerProfile.findMany({
       where: {
         isPublished: true,

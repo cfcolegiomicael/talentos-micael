@@ -10,7 +10,7 @@ export default async function MeuPerfilPage() {
   const user = await requireUser();
 
   const [categories, profile, dbUser] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.category.findMany({ where: { status: "APPROVED" }, orderBy: { name: "asc" } }),
     prisma.providerProfile.findUnique({
       where: { userId: user.id },
       include: { categories: true, photos: { orderBy: { position: "asc" } } },

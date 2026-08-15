@@ -95,8 +95,8 @@ export async function createCategoryAction(formData: FormData) {
 
   await prisma.category.upsert({
     where: { name },
-    update: {},
-    create: { name, slug: slugify(name) },
+    update: { status: "APPROVED" },
+    create: { name, slug: slugify(name), status: "APPROVED" },
   });
 
   revalidatePath("/admin/categorias");
@@ -108,6 +108,18 @@ export async function deleteCategoryAction(id: string) {
   const inUse = await prisma.profileCategory.count({ where: { categoryId: id } });
   if (inUse > 0) return;
 
+  await prisma.category.delete({ where: { id } });
+  revalidatePath("/admin/categorias");
+}
+
+export async function approveCategoryAction(id: string) {
+  await requireAdmin();
+  await prisma.category.update({ where: { id }, data: { status: "APPROVED" } });
+  revalidatePath("/admin/categorias");
+}
+
+export async function rejectCategoryAction(id: string) {
+  await requireAdmin();
   await prisma.category.delete({ where: { id } });
   revalidatePath("/admin/categorias");
 }
