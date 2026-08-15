@@ -1,3 +1,4 @@
+import { Download } from "lucide-react";
 import { toggleUserRoleAction, toggleUserStatusAction } from "@/actions/admin-actions";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
@@ -24,8 +25,17 @@ export default async function UsuariosAdminPage() {
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Usuários da comunidade</CardTitle>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          render={<a href="/api/admin/export" />}
+        >
+          <Download className="size-3.5" />
+          Exportar dados
+        </Button>
       </CardHeader>
       <CardContent className="overflow-x-auto">
         <Table>
