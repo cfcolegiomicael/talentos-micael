@@ -1,0 +1,133 @@
+// Prisma schema — Plataforma de Talentos, Colégio Waldorf Micael
+// learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  MEMBER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+// Reservado para a fase de assinatura paga futura — o campo já existe,
+// mas nenhuma lógica de cobrança lê/escreve nele ainda.
+enum MembershipStatus {
+  FREE
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+model User {
+  id               String           @id @default(cuid())
+  name             String
+  email            String           @unique
+  passwordHash     String
+  phone            String?
+  role             Role             @default(MEMBER)
+  status           UserStatus       @default(ACTIVE)
+  membershipStatus MembershipStatus @default(FREE)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  invitedById   String?
+  invitedByCode InviteCode? @relation("InviteCodeUsedBy", fields: [invitedById], references: [id])
+
+  providerProfile ProviderProfile?
+  ratingsGiven    Rating[]         @relation("RatingsGiven")
+  inviteCodesMade InviteCode[]     @relation("InviteCodeCreator")
+
+  @@index([invitedById])
+}
+
+model InviteCode {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  label       String?
+  maxUses     Int       @default(1)
+  useCount    Int       @default(0)
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+  createdById String
+  createdBy   User      @relation("InviteCodeCreator", fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+
+  users User[] @relation("InviteCodeUsedBy")
+
+  @@index([createdById])
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  profiles ProfileCategory[]
+}
+
+model ProviderProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName String?
+  description  String   @db.Text
+  whatsapp     String?
+  publicEmail  String?
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  categories ProfileCategory[]
+  photos     ProfilePhoto[]
+  ratings    Rating[]
+
+  @@index([isPublished])
+}
+
+model ProfileCategory {
+  providerProfileId String
+  categoryId         String
+  providerProfile    ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  category           Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([providerProfileId, categoryId])
+  @@index([categoryId])
+}
+
+model ProfilePhoto {
+  id                String          @id @default(cuid())
+  providerProfileId String
+  providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  url               String
+  publicId          String?
+  position          Int             @default(0)
+  createdAt         DateTime        @default(now())
+
+  @@index([providerProfileId])
+}
+
+model Rating {
+  id                String          @id @default(cuid())
+  providerProfileId String
+  providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  raterUserId       String
+  rater             User            @relation("RatingsGiven", fields: [raterUserId], references: [id], onDelete: Cascade)
+  score             Int
+  comment           String?         @db.Text
+  createdAt         DateTime        @default(now())
+
+  @@unique([providerProfileId, raterUserId])
+  @@index([providerProfileId])
+}
