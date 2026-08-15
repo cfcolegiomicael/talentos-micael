@@ -18,7 +18,7 @@ export function AppNav({ isAdmin }: { isAdmin: boolean }) {
     <header className="border-b">
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 p-4">
         <Link href="/diretorio" className="font-semibold">
-          Talentos Waldorf Micael
+          Talentos Comunidade Colégio Micael
         </Link>
         <nav className="flex flex-wrap items-center gap-1">
           {links.map((link) => (

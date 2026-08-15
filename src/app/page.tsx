@@ -11,7 +11,7 @@ export default async function Home() {
     <div className="flex flex-1 flex-col items-center justify-center gap-8 p-6 text-center">
       <div className="flex max-w-lg flex-col gap-4">
         <h1 className="text-3xl font-semibold tracking-tight">
-          Talentos Waldorf Micael
+          Talentos Comunidade Colégio Micael
         </h1>
         <p className="text-muted-foreground text-lg">
           Diretório privado de serviços da comunidade do Colégio Waldorf

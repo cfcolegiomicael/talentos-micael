@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/session";
 import { LoginForm } from "@/components/auth/login-form";
 
-export const metadata = { title: "Entrar — Talentos Waldorf Micael" };
+export const metadata = { title: "Entrar — Talentos Comunidade Colégio Micael" };
 
 export default async function EntrarPage() {
   const user = await getCurrentUser();

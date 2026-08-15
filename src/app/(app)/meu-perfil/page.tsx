@@ -4,7 +4,7 @@ import { ProfileForm } from "@/components/profile/profile-form";
 import { PhotoUploader } from "@/components/profile/photo-uploader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export const metadata = { title: "Meu perfil — Talentos Waldorf Micael" };
+export const metadata = { title: "Meu perfil — Talentos Comunidade Colégio Micael" };
 
 export default async function MeuPerfilPage() {
   const user = await requireUser();

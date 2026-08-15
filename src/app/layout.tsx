@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Talentos Waldorf Micael",
+  title: "Talentos Comunidade Colégio Micael",
   description: "Diretório privado de serviços da comunidade do Colégio Waldorf Micael",
   robots: { index: false, follow: false },
 };

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProviderCard, type ProviderCardData } from "@/components/directory/provider-card";
 
-export const metadata = { title: "Diretório — Talentos Waldorf Micael" };
+export const metadata = { title: "Diretório — Talentos Comunidade Colégio Micael" };
 
 function buildHref(q: string | undefined, categoria: string | undefined) {
   const params = new URLSearchParams();
