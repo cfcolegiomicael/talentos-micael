@@ -9,12 +9,13 @@ export const metadata = { title: "Meu perfil — Talentos Comunidade Colégio Mi
 export default async function MeuPerfilPage() {
   const user = await requireUser();
 
-  const [categories, profile] = await Promise.all([
+  const [categories, profile, dbUser] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: "asc" } }),
     prisma.providerProfile.findUnique({
       where: { userId: user.id },
       include: { categories: true, photos: { orderBy: { position: "asc" } } },
     }),
+    prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { name: true } }),
   ]);
 
   return (
@@ -38,8 +39,10 @@ export default async function MeuPerfilPage() {
       <ProfileForm
         categories={categories}
         defaultValues={{
+          fullName: dbUser.name,
           businessName: profile?.businessName ?? "",
           description: profile?.description ?? "",
+          address: profile?.address ?? "",
           whatsapp: profile?.whatsapp ?? "",
           publicEmail: profile?.publicEmail ?? "",
           categoryIds: profile?.categories.map((c) => c.categoryId) ?? [],

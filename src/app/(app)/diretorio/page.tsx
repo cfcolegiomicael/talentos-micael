@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SearchX } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -106,9 +107,10 @@ export default async function DiretorioPage(props: {
       </div>
 
       {providers.length === 0 ? (
-        <p className="text-muted-foreground py-12 text-center">
-          Nenhum perfil encontrado. Tente outra busca ou categoria.
-        </p>
+        <div className="text-muted-foreground flex flex-col items-center gap-2 py-12 text-center">
+          <SearchX className="size-8" />
+          <p>Nenhum perfil encontrado. Tente outra busca ou categoria.</p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {providers.map((provider) => (

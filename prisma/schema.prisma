@@ -83,6 +83,7 @@ model ProviderProfile {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   businessName String?
   description  String   @db.Text
+  address      String?
   whatsapp     String?
   publicEmail  String?
   isPublished  Boolean  @default(false)

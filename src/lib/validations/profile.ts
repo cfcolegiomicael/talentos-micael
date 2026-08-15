@@ -1,12 +1,14 @@
 import { z } from "zod";
 
 export const profileSchema = z.object({
+  fullName: z.string().trim().min(2, "Informe seu nome completo."),
   businessName: z.string().trim().max(120).optional().or(z.literal("")),
   description: z
     .string()
     .trim()
     .min(20, "Descreva seu serviço com pelo menos 20 caracteres.")
     .max(2000),
+  address: z.string().trim().max(200).optional().or(z.literal("")),
   whatsapp: z.string().trim().max(30).optional().or(z.literal("")),
   publicEmail: z
     .string()

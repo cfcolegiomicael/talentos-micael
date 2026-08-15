@@ -18,15 +18,29 @@ export async function updateProfileAction(
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
-  const { businessName, description, whatsapp, publicEmail, categoryIds, isPublished } =
-    parsed.data;
+  const {
+    fullName,
+    businessName,
+    description,
+    address,
+    whatsapp,
+    publicEmail,
+    categoryIds,
+    isPublished,
+  } = parsed.data;
 
   await prisma.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: user.id },
+      data: { name: fullName },
+    });
+
     const profile = await tx.providerProfile.upsert({
       where: { userId: user.id },
       update: {
         businessName: businessName || null,
         description,
+        address: address || null,
         whatsapp: whatsapp || null,
         publicEmail: publicEmail || null,
         isPublished,
@@ -35,6 +49,7 @@ export async function updateProfileAction(
         userId: user.id,
         businessName: businessName || null,
         description,
+        address: address || null,
         whatsapp: whatsapp || null,
         publicEmail: publicEmail || null,
         isPublished,
