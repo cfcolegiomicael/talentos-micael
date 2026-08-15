@@ -45,6 +45,10 @@ export default async function MeuPerfilPage() {
           address: profile?.address ?? "",
           whatsapp: profile?.whatsapp ?? "",
           publicEmail: profile?.publicEmail ?? "",
+          website: profile?.website ?? "",
+          instagramUrl: profile?.instagramUrl ?? "",
+          facebookUrl: profile?.facebookUrl ?? "",
+          linkedinUrl: profile?.linkedinUrl ?? "",
           categoryIds: profile?.categories.map((c) => c.categoryId) ?? [],
           isPublished: profile?.isPublished ?? false,
         }}

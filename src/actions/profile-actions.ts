@@ -9,6 +9,11 @@ export type ProfileActionResult = {
   error?: string;
 };
 
+function normalizeUrl(value: string | undefined): string | null {
+  if (!value) return null;
+  return /^https?:\/\//i.test(value) ? value : `https://${value}`;
+}
+
 export async function updateProfileAction(
   input: ProfileInput
 ): Promise<ProfileActionResult> {
@@ -25,6 +30,10 @@ export async function updateProfileAction(
     address,
     whatsapp,
     publicEmail,
+    website,
+    instagramUrl,
+    facebookUrl,
+    linkedinUrl,
     categoryIds,
     isPublished,
   } = parsed.data;
@@ -43,6 +52,10 @@ export async function updateProfileAction(
         address: address || null,
         whatsapp: whatsapp || null,
         publicEmail: publicEmail || null,
+        website: normalizeUrl(website),
+        instagramUrl: normalizeUrl(instagramUrl),
+        facebookUrl: normalizeUrl(facebookUrl),
+        linkedinUrl: normalizeUrl(linkedinUrl),
         isPublished,
       },
       create: {
@@ -52,6 +65,10 @@ export async function updateProfileAction(
         address: address || null,
         whatsapp: whatsapp || null,
         publicEmail: publicEmail || null,
+        website: normalizeUrl(website),
+        instagramUrl: normalizeUrl(instagramUrl),
+        facebookUrl: normalizeUrl(facebookUrl),
+        linkedinUrl: normalizeUrl(linkedinUrl),
         isPublished,
       },
     });

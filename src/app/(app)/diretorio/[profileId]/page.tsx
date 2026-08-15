@@ -1,7 +1,17 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MapPin, Phone, Mail, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Phone,
+  Mail,
+  Star,
+  Globe,
+  AtSign,
+  Users,
+  Briefcase,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
 import { Badge } from "@/components/ui/badge";
@@ -70,6 +80,14 @@ export default async function ProviderProfilePage(props: {
 
   const displayName = profile.businessName || profile.user.name;
   const hasContact = Boolean(profile.whatsapp || profile.publicEmail);
+  const links = [
+    { url: profile.website, label: profile.website, icon: Globe },
+    { url: profile.instagramUrl, label: "Instagram", icon: AtSign },
+    { url: profile.facebookUrl, label: "Facebook", icon: Users },
+    { url: profile.linkedinUrl, label: "LinkedIn", icon: Briefcase },
+  ].filter((link): link is { url: string; label: string; icon: typeof Globe } =>
+    Boolean(link.url)
+  );
 
   const approvedRatings = profile.ratings.filter((r) => r.status === "APPROVED");
   const ratingsByCategory = profile.categories
@@ -175,6 +193,31 @@ export default async function ProviderProfilePage(props: {
                 {profile.publicEmail}
               </a>
             )}
+          </CardContent>
+        </Card>
+      )}
+
+      {links.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Links</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-2 text-sm">
+            {links.map((link) => {
+              const Icon = link.icon;
+              return (
+                <a
+                  key={link.url}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-primary underline-offset-4 hover:underline"
+                >
+                  <Icon className="size-3.5" />
+                  {link.label}
+                </a>
+              );
+            })}
           </CardContent>
         </Card>
       )}

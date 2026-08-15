@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+const optionalUrl = z
+  .string()
+  .trim()
+  .max(300)
+  .optional()
+  .or(z.literal(""))
+  .refine((val) => !val || /^(https?:\/\/)?[^\s.]+\.[^\s]{2,}$/i.test(val), {
+    message: "Link inválido.",
+  });
+
 export const profileSchema = z.object({
   fullName: z.string().trim().min(2, "Informe seu nome completo."),
   businessName: z.string().trim().max(120).optional().or(z.literal("")),
@@ -17,6 +27,10 @@ export const profileSchema = z.object({
     .email("E-mail inválido.")
     .optional()
     .or(z.literal("")),
+  website: optionalUrl,
+  instagramUrl: optionalUrl,
+  facebookUrl: optionalUrl,
+  linkedinUrl: optionalUrl,
   categoryIds: z
     .array(z.string())
     .min(1, "Selecione pelo menos uma categoria."),

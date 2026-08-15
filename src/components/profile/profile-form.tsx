@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { User, MapPin, Phone, Mail, Tag, Eye } from "lucide-react";
+import { User, MapPin, Phone, Mail, Tag, Eye, Globe, AtSign, Users, Briefcase } from "lucide-react";
 import { profileSchema, type ProfileInput } from "@/lib/validations/profile";
 import { updateProfileAction } from "@/actions/profile-actions";
 import { Button } from "@/components/ui/button";
@@ -188,6 +188,69 @@ export function ProfileForm({
           <p className="text-muted-foreground text-xs">
             Confira os dados de contato antes de salvar — é por eles que outros membros vão falar com você.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="size-4" />
+            Links (opcional)
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="website" className="flex items-center gap-1.5">
+              <Globe className="size-3.5" />
+              Site
+            </Label>
+            <Input id="website" placeholder="seusite.com.br" {...register("website")} />
+            {errors.website && (
+              <p className="text-sm text-destructive">{errors.website.message}</p>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="instagramUrl" className="flex items-center gap-1.5">
+              <AtSign className="size-3.5" />
+              Instagram
+            </Label>
+            <Input
+              id="instagramUrl"
+              placeholder="instagram.com/seuperfil"
+              {...register("instagramUrl")}
+            />
+            {errors.instagramUrl && (
+              <p className="text-sm text-destructive">{errors.instagramUrl.message}</p>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="facebookUrl" className="flex items-center gap-1.5">
+              <Users className="size-3.5" />
+              Facebook
+            </Label>
+            <Input
+              id="facebookUrl"
+              placeholder="facebook.com/suapagina"
+              {...register("facebookUrl")}
+            />
+            {errors.facebookUrl && (
+              <p className="text-sm text-destructive">{errors.facebookUrl.message}</p>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="linkedinUrl" className="flex items-center gap-1.5">
+              <Briefcase className="size-3.5" />
+              LinkedIn
+            </Label>
+            <Input
+              id="linkedinUrl"
+              placeholder="linkedin.com/in/seuperfil"
+              {...register("linkedinUrl")}
+            />
+            {errors.linkedinUrl && (
+              <p className="text-sm text-destructive">{errors.linkedinUrl.message}</p>
+            )}
+          </div>
         </CardContent>
       </Card>
 
