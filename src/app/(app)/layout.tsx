@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/session";
-import { AppNav } from "@/components/nav/app-nav";
+import { AppShell } from "@/components/nav/app-shell";
 
 export default async function AppLayout({
   children,
@@ -8,10 +10,14 @@ export default async function AppLayout({
 }) {
   const user = await requireUser();
 
-  return (
-    <div className="flex flex-1 flex-col">
-      <AppNav isAdmin={user.role === "ADMIN"} />
-      <main className="mx-auto w-full max-w-5xl flex-1 p-4">{children}</main>
-    </div>
-  );
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { termsAcceptedAt: true },
+  });
+
+  if (!dbUser?.termsAcceptedAt) {
+    redirect("/termos");
+  }
+
+  return <AppShell isAdmin={user.role === "ADMIN"}>{children}</AppShell>;
 }

@@ -1,7 +1,9 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { signIn } from "@/lib/auth";
+import { requireUser } from "@/lib/session";
 import { registerSchema, type RegisterInput } from "@/lib/validations/auth";
 import bcrypt from "bcryptjs";
 
@@ -70,4 +72,15 @@ export async function registerAction(
   });
 
   return {};
+}
+
+export async function acceptTermsAction() {
+  const user = await requireUser();
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { termsAcceptedAt: new Date() },
+  });
+
+  redirect("/diretorio");
 }

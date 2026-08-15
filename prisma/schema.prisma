@@ -38,6 +38,7 @@ model User {
   role             Role             @default(MEMBER)
   status           UserStatus       @default(ACTIVE)
   membershipStatus MembershipStatus @default(FREE)
+  termsAcceptedAt  DateTime?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 

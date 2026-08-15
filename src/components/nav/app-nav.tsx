@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Compass, UserRound, Star, ShieldCheck, LogOut } from "lucide-react";
+import { Compass, UserRound, Star, ShieldCheck, FileText, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +55,18 @@ export function AppNav({ isAdmin }: { isAdmin: boolean }) {
               Admin
             </Button>
           )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              "gap-1.5",
+              pathname.startsWith("/termos") && "bg-accent text-accent-foreground"
+            )}
+            render={<Link href="/termos" />}
+          >
+            <FileText className="size-3.5" />
+            Termos de Uso
+          </Button>
           <Button
             variant="ghost"
             size="sm"
