@@ -8,25 +8,43 @@ import { ratingSchema, type RatingInput } from "@/lib/validations/rating";
 import { submitRatingAction } from "@/actions/rating-actions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+
+type Category = { id: string; name: string };
+type MyRating = { score: number; comment: string };
 
 export function RatingForm({
   profileId,
-  defaultValues,
+  categories,
+  myRatingsByCategory,
 }: {
   profileId: string;
-  defaultValues: RatingInput;
+  categories: Category[];
+  myRatingsByCategory: Record<string, MyRating>;
 }) {
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const firstCategoryId = categories[0]?.id ?? "";
   const {
     handleSubmit,
     control,
+    setValue,
     formState: { errors },
   } = useForm<RatingInput>({
     resolver: zodResolver(ratingSchema),
-    defaultValues,
+    defaultValues: {
+      categoryId: firstCategoryId,
+      score: myRatingsByCategory[firstCategoryId]?.score ?? 0,
+      comment: myRatingsByCategory[firstCategoryId]?.comment ?? "",
+    },
   });
 
   const onSubmit = (data: RatingInput) => {
@@ -37,13 +55,49 @@ export function RatingForm({
         setServerError(result.error);
         toast.error(result.error);
       } else {
-        toast.success("Avaliação enviada. Obrigado!");
+        toast.success(
+          "Avaliação enviada para moderação. Obrigado! Ela ficará visível assim que um administrador confirmar."
+        );
       }
     });
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
+      {categories.length > 1 && (
+        <Controller
+          name="categoryId"
+          control={control}
+          render={({ field }) => (
+            <Select
+              value={field.value}
+              onValueChange={(next) => {
+                if (!next) return;
+                field.onChange(next);
+                const existing = myRatingsByCategory[next];
+                setValue("score", existing?.score ?? 0);
+                setValue("comment", existing?.comment ?? "");
+              }}
+            >
+              <SelectTrigger className="w-full sm:w-64">
+                <SelectValue placeholder="Qual serviço você usou?">
+                  {(value: string | null) =>
+                    categories.find((c) => c.id === value)?.name ?? "Qual serviço você usou?"
+                  }
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+        />
+      )}
+
       <Controller
         name="score"
         control={control}

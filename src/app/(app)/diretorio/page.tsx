@@ -48,7 +48,7 @@ export default async function DiretorioPage(props: {
         user: { select: { name: true } },
         categories: { include: { category: true } },
         photos: { orderBy: { position: "asc" }, take: 1 },
-        ratings: { select: { score: true } },
+        ratings: { where: { status: "APPROVED" }, select: { score: true } },
       },
       orderBy: { updatedAt: "desc" },
     }),

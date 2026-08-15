@@ -111,3 +111,15 @@ export async function deleteCategoryAction(id: string) {
   await prisma.category.delete({ where: { id } });
   revalidatePath("/admin/categorias");
 }
+
+export async function approveRatingAction(id: string) {
+  await requireAdmin();
+  await prisma.rating.update({ where: { id }, data: { status: "APPROVED" } });
+  revalidatePath("/admin/avaliacoes");
+}
+
+export async function rejectRatingAction(id: string) {
+  await requireAdmin();
+  await prisma.rating.update({ where: { id }, data: { status: "REJECTED" } });
+  revalidatePath("/admin/avaliacoes");
+}

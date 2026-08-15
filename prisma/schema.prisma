@@ -75,6 +75,7 @@ model Category {
   createdAt DateTime @default(now())
 
   profiles ProfileCategory[]
+  ratings  Rating[]
 }
 
 model ProviderProfile {
@@ -119,16 +120,27 @@ model ProfilePhoto {
   @@index([providerProfileId])
 }
 
+enum RatingStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Rating {
   id                String          @id @default(cuid())
   providerProfileId String
   providerProfile   ProviderProfile @relation(fields: [providerProfileId], references: [id], onDelete: Cascade)
+  categoryId        String
+  category          Category        @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   raterUserId       String
   rater             User            @relation("RatingsGiven", fields: [raterUserId], references: [id], onDelete: Cascade)
   score             Int
   comment           String?         @db.Text
+  status            RatingStatus    @default(PENDING)
   createdAt         DateTime        @default(now())
 
-  @@unique([providerProfileId, raterUserId])
+  @@unique([providerProfileId, categoryId, raterUserId])
   @@index([providerProfileId])
+  @@index([categoryId])
+  @@index([status])
 }

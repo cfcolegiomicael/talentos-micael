@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Ticket, Users, Tag } from "lucide-react";
+import { Ticket, Users, Tag, MessageSquareText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,7 @@ const adminLinks = [
   { href: "/admin/convites", label: "Convites", icon: Ticket },
   { href: "/admin/usuarios", label: "Usuários", icon: Users },
   { href: "/admin/categorias", label: "Categorias", icon: Tag },
+  { href: "/admin/avaliacoes", label: "Avaliações", icon: MessageSquareText },
 ];
 
 export function AdminNav() {

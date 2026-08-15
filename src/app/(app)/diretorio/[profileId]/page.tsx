@@ -51,7 +51,10 @@ export default async function ProviderProfilePage(props: {
       categories: { include: { category: true } },
       photos: { orderBy: { position: "asc" } },
       ratings: {
-        include: { rater: { select: { name: true } } },
+        include: {
+          rater: { select: { name: true } },
+          category: { select: { id: true, name: true } },
+        },
         orderBy: { createdAt: "desc" },
       },
     },
@@ -65,14 +68,22 @@ export default async function ProviderProfilePage(props: {
     notFound();
   }
 
-  const ratingCount = profile.ratings.length;
-  const ratingAverage = ratingCount
-    ? profile.ratings.reduce((sum, r) => sum + r.score, 0) / ratingCount
-    : null;
-
   const displayName = profile.businessName || profile.user.name;
-  const myRating = profile.ratings.find((r) => r.raterUserId === user.id);
   const hasContact = Boolean(profile.whatsapp || profile.publicEmail);
+
+  const approvedRatings = profile.ratings.filter((r) => r.status === "APPROVED");
+  const ratingsByCategory = profile.categories
+    .map(({ category }) => ({
+      category,
+      ratings: approvedRatings.filter((r) => r.categoryId === category.id),
+    }))
+    .filter((group) => group.ratings.length > 0);
+
+  const myRatingsByCategory = Object.fromEntries(
+    profile.ratings
+      .filter((r) => r.raterUserId === user.id)
+      .map((r) => [r.categoryId, { score: r.score, comment: r.comment ?? "" }])
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -168,33 +179,48 @@ export default async function ProviderProfilePage(props: {
         </Card>
       )}
 
-      {ratingCount > 0 && (
+      {ratingsByCategory.length > 0 && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Avaliações da comunidade
-              <span className="text-muted-foreground flex items-center gap-1 font-normal">
-                <Stars score={Math.round(ratingAverage ?? 0)} className="text-amber-500" />
-                {ratingAverage?.toFixed(1)} ({ratingCount})
-              </span>
-            </CardTitle>
+            <CardTitle>Avaliações da comunidade</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            {profile.ratings.map((rating, index) => (
-              <div key={rating.id}>
-                {index > 0 && <Separator className="mb-4" />}
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm">{rating.rater.name}</span>
-                  <Stars score={rating.score} className="text-amber-500" />
+          <CardContent className="flex flex-col gap-6">
+            {ratingsByCategory.map((group, groupIndex) => {
+              const count = group.ratings.length;
+              const average =
+                group.ratings.reduce((sum, r) => sum + r.score, 0) / count;
+              return (
+                <div key={group.category.id}>
+                  {groupIndex > 0 && <Separator className="mb-6" />}
+                  <div className="mb-3 flex items-center gap-2">
+                    <h3 className="font-medium text-sm">{group.category.name}</h3>
+                    <span className="text-muted-foreground flex items-center gap-1 text-sm">
+                      <Stars score={Math.round(average)} className="text-amber-500" />
+                      {average.toFixed(1)} ({count})
+                    </span>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {group.ratings.map((rating, index) => (
+                      <div key={rating.id}>
+                        {index > 0 && <Separator className="mb-4" />}
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-sm">{rating.rater.name}</span>
+                          <Stars score={rating.score} className="text-amber-500" />
+                        </div>
+                        {rating.comment && (
+                          <p className="text-muted-foreground mt-1 text-sm">
+                            {rating.comment}
+                          </p>
+                        )}
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          {formatDate(rating.createdAt)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                {rating.comment && (
-                  <p className="text-muted-foreground mt-1 text-sm">{rating.comment}</p>
-                )}
-                <p className="text-muted-foreground mt-1 text-xs">
-                  {formatDate(rating.createdAt)}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       )}
@@ -202,17 +228,13 @@ export default async function ProviderProfilePage(props: {
       {!isOwner && (
         <Card>
           <CardHeader>
-            <CardTitle>
-              {myRating ? "Atualizar minha avaliação" : "Avaliar este prestador"}
-            </CardTitle>
+            <CardTitle>Avaliar este prestador</CardTitle>
           </CardHeader>
           <CardContent>
             <RatingForm
               profileId={profile.id}
-              defaultValues={{
-                score: myRating?.score ?? 0,
-                comment: myRating?.comment ?? "",
-              }}
+              categories={profile.categories.map((c) => c.category)}
+              myRatingsByCategory={myRatingsByCategory}
             />
           </CardContent>
         </Card>

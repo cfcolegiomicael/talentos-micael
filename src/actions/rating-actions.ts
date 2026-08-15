@@ -17,10 +17,15 @@ export async function submitRatingAction(
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Dados inválidos." };
   }
+  const { categoryId, score, comment } = parsed.data;
 
   const profile = await prisma.providerProfile.findUnique({
     where: { id: profileId },
-    select: { id: true, userId: true },
+    select: {
+      id: true,
+      userId: true,
+      categories: { select: { categoryId: true } },
+    },
   });
   if (!profile) {
     return { error: "Perfil não encontrado." };
@@ -28,23 +33,29 @@ export async function submitRatingAction(
   if (profile.userId === user.id) {
     return { error: "Você não pode avaliar o próprio perfil." };
   }
+  if (!profile.categories.some((c) => c.categoryId === categoryId)) {
+    return { error: "Categoria inválida para este prestador." };
+  }
 
   await prisma.rating.upsert({
     where: {
-      providerProfileId_raterUserId: {
+      providerProfileId_categoryId_raterUserId: {
         providerProfileId: profile.id,
+        categoryId,
         raterUserId: user.id,
       },
     },
     update: {
-      score: parsed.data.score,
-      comment: parsed.data.comment || null,
+      score,
+      comment: comment || null,
+      status: "PENDING",
     },
     create: {
       providerProfileId: profile.id,
+      categoryId,
       raterUserId: user.id,
-      score: parsed.data.score,
-      comment: parsed.data.comment || null,
+      score,
+      comment: comment || null,
     },
   });
 
